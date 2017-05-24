@@ -9,7 +9,16 @@ class Contract < ApplicationRecord
 
   private
 
-  def notify_people
+  def notify_people(transition)
     puts 'notified'
+    puts transition_args(transition)
+  end
+
+  def transition_args(transition)
+    if !transition.args.empty? && transition.args[0]&.is_a?(Hash)
+      transition.args[0]
+    else
+      {}
+    end
   end
 end
