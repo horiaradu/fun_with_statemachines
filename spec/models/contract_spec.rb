@@ -9,14 +9,20 @@ RSpec.describe Contract, type: :model do
   end
 
   it 'transitions to completed' do
-    contract.complete
+    expect(contract.complete).to be_truthy
     expect(contract.state).to eq('completed')
     expect(contract.completed?).to be_truthy
   end
 
   it 'transitions with arguments' do
-    contract.complete(foo: 'bar')
+    expect(contract.complete(foo: 'bar')).to be_truthy
     expect(contract.state).to eq('completed')
     expect(contract.completed?).to be_truthy
+  end
+
+  it "can't transition twice" do
+    contract.complete
+    expect(contract.complete).to be_falsey
+    expect { contract.complete! }.to raise_error(StateMachines::InvalidTransition)
   end
 end
