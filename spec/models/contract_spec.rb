@@ -8,7 +8,13 @@ RSpec.describe Contract, type: :model do
     expect(contract.draft?).to be_truthy
   end
 
+  it "can't sign a blank contract" do
+    expect(contract.sign).to be_falsey
+    expect(contract.signed?).to be_falsey
+  end
+
   it 'sign' do
+    contract.update(text: 'really selling your soul')
     expect(contract.sign).to be_truthy
     expect(contract.state).to eq('signed')
     expect(contract.signed?).to be_truthy

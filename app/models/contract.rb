@@ -1,7 +1,7 @@
 class Contract < ApplicationRecord
   state_machine initial: :draft do
     event :sign do
-      transition draft: :signed
+      transition draft: :signed, if: ->(contract) { contract.text && !contract.text.blank? }
     end
 
     event :approve_by_manager do
