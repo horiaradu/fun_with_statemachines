@@ -1,7 +1,15 @@
 class Contract < ApplicationRecord
   state_machine initial: :draft do
-    event :complete do
-      transition draft: :completed
+    event :sign do
+      transition draft: :signed
+    end
+
+    event :approve_by_manager do
+      transition any - :burned => :completed
+    end
+
+    event :burn do
+      transition any => :burned
     end
 
     after_transition on: :complete, do: :notify_people
