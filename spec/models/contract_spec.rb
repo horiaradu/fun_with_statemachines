@@ -2,50 +2,31 @@ require 'rails_helper'
 
 RSpec.describe Contract, type: :model do
   let(:contract) { create(:contract) }
+  let!(:a_guy) { create(:guy, contract: contract) }
+  let!(:another_guy) { create(:guy, contract: contract) }
+  let!(:a_manager) { create(:manager, contract: contract) }
 
   it 'initially, the contract is a draft' do
     expect(contract.state).to eq('draft')
     expect(contract.draft?).to be_truthy
+
+    expect(contract.people.size).to eq(3)
   end
 
-  it "can't sign a blank contract" do
-    expect(contract.sign).to be_falsey
-    expect(contract.signed?).to be_falsey
+  it 'a guy signing a contract is not enough' do
+    a_guy.sign_contract
+    expect(contract.draft?).to be_truthy
   end
 
-  it 'sign' do
-    contract.update(text: 'really selling your soul')
-    expect(contract.sign).to be_truthy
-    expect(contract.state).to eq('signed')
+  it 'if both guys sign it, then it is done' do
+    a_guy.sign_contract
+    expect(contract.draft?).to be_truthy
+    another_guy.sign_contract
     expect(contract.signed?).to be_truthy
   end
 
-  describe 'approving' do
-    it 'a draft' do
-      expect(contract.approve_by_manager).to be_truthy
-      expect(contract.state).to eq('completed')
-      expect(contract.completed?).to be_truthy
-    end
-
-    it 'a signed contract' do
-      contract.sign
-      expect(contract.approve_by_manager).to be_truthy
-      expect(contract.state).to eq('completed')
-      expect(contract.completed?).to be_truthy
-    end
-
-    it 'a burnt contract' do
-      contract.burn
-      expect(contract.approve_by_manager).to be_falsey
-      expect(contract.state).to eq('burned')
-      expect(contract.burned?).to be_truthy
-    end
-  end
-
-  it 'burning a completed contract' do
-    contract.approve_by_manager
-    expect(contract.burn).to be_truthy
-    expect(contract.state).to eq('burned')
-    expect(contract.burned?).to be_truthy
+  it 'if the manager signs it, then that is also ok' do
+    a_manager.sign_contract
+    expect(contract.signed?).to be_truthy
   end
 end
